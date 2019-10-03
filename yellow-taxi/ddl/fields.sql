@@ -57,7 +57,7 @@ from
       AND
         pickup_longitude * pickup_latitude * dropoff_longitude * dropoff_latitude > 0
       AND
-        fare_amount > 0 and trip_distance > 0
+        fare_amount >= 1 and trip_distance > 0
       AND
         MOD(ABS(FARM_FINGERPRINT(CAST(dropoff_datetime AS STRING))), 10000) = 1
     )
