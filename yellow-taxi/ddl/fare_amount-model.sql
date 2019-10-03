@@ -1,3 +1,4 @@
+--try with distance only first
 create or replace view 
    bqml.fare_amount_stream as
 select
