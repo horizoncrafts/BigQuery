@@ -20,14 +20,15 @@ create or replace view
    bqml.extra_logst_stream as
 select
  class,
- CAST(extra as STRING) as extra_str
+ CAST(extra as STRING) as extra_str 
  ,
--- trip_hourofday 
---  pickup_datetime 
- dropoff_datetime 
--- ,trip_weekhour_fc 
--- ,trip_dayofweek 
--- ,geo_distance_miles 
+  trip_hourofday ,
+ pickup_datetime 
+ ,trip_weekhour_fc 
+ trip_dayofweek 
+ ,geo_distance_miles 
+,EXTRACT(TIME FROM pickup_datetime) AS trip_time
+--,EXTRACT(TIME FROM DATETIME_ADD(pickup_datetime, INTERVAL CAST(geo_distance_miles / 12 * 3600 as INT64) SECOND)) as dropoff_ext
 from
  mybqml.bqml.data_stream
  ;
@@ -64,6 +65,13 @@ from
 ;
 
 
+
+0.7032843534221889
+0.3679294450696444
+0.5435163551401869
+0.30290337531150047
+1.077763507431056
+0.5711576666666667
 	
 0.925260730999823
 0.8764757692137326
@@ -74,12 +82,12 @@ from
 
  
 select 
-  *
+  * EXCEPT predicted_extra_str_probs
 from
   ML.PREDICT( 
     MODEL bqml.extra_logst_model,
     (
-      select *
+      select *,EXTRACT(TIME FROM pickup_datetime) AS trip_time
       from `bqml.data_stream` 
       where class = 'TEST'
     )
