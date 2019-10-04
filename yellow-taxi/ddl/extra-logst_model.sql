@@ -81,14 +81,17 @@ from
 0.7475836276517964
 0.9501716666666666
 
- 
+ ;
 select 
-  * EXCEPT predicted_extra_str_probs
+  * EXCEPT( predicted_extra_str_probs, predicted_extra_str),
+  CAST( predicted_extra_str as FLOAT64 ) as predicted_extra
 from
   ML.PREDICT( 
     MODEL bqml.extra_logst_model,
     (
-      select *,EXTRACT(TIME FROM pickup_datetime) AS trip_time
+      select *
+      ,EXTRACT(TIME FROM pickup_datetime) AS trip_time
+      ,EXTRACT(TIME FROM DATETIME_ADD(pickup_datetime, INTERVAL CAST(geo_distance_miles / 12 * 3600 as INT64) SECOND)) as dropoff_ext
       from `bqml.data_stream` 
       where class = 'TEST'
     )
