@@ -16,19 +16,18 @@ order by
 trip_hourofday 
 ;
 
+
 create or replace view 
    bqml.extra_logst_stream as
 select
  class,
- CAST(extra as STRING) as extra_str 
- ,
-  trip_hourofday ,
- pickup_datetime 
- ,trip_weekhour_fc 
- trip_dayofweek 
- ,geo_distance_miles 
-,EXTRACT(TIME FROM pickup_datetime) AS trip_time
-,EXTRACT(TIME FROM DATETIME_ADD(pickup_datetime, INTERVAL CAST(geo_distance_miles / 12 * 3600 as INT64) SECOND)) as dropoff_ext
+ extra,
+ trip_hourofday,
+ pickup_time,
+ trip_weekhour_fc, 
+ trip_dayofweek,
+ geo_distance_miles,
+ dropoff_time_est
 from
  mybqml.bqml.data_stream
  ;
@@ -39,8 +38,7 @@ CREATE OR REPLACE MODEL
 OPTIONS
   ( model_type='LOGISTIC_REG',
     auto_class_weights=TRUE,
---    CLASS_WEIGHTS = [STRUCT('0.5', 	1.0), STRUCT('0', 1.0), STRUCT('1', 1.0)],
-    input_label_cols=['extra_str']
+    input_label_cols=['extra']
   ) 
 AS
   select 
@@ -63,6 +61,7 @@ from
     )
   )
 ;
+
 
 
 

@@ -43,7 +43,7 @@ where class = 'TEST'
  from
  ML.PREDICT( MODEL bqml.fare_amount_model,
   (
-    select *
+    select fare_amount, * EXCEPT(fare_amount)
     from `bqml.data_stream` 
     where class = 'TEST'
    )

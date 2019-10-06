@@ -1,5 +1,5 @@
 
-create or replace view mybqml:bqml.tlc_yellow_trips_2015_fields
+create or replace view mybqml.bqml.tlc_yellow_trips_2015_fields
 as
 SELECT
   *,
@@ -7,7 +7,8 @@ SELECT
   ST_Y(pickup_geo_snap) pickup_geo_snap_lattitude,
   ST_X(dropoff_geo_snap) dropoff_geo_snap_longitude,
   ST_Y(dropoff_geo_snap) dropoff_geo_snap_lattitude,
-  ST_DISTANCE(dropoff_geo_snap, pickup_geo_snap) / 1609 as geo_distance_snap_miles
+  ST_DISTANCE(dropoff_geo_snap, pickup_geo_snap) / 1609 as geo_distance_snap_miles,
+  EXTRACT(TIME FROM DATETIME_ADD(pickup_datetime, INTERVAL CAST(geo_distance_miles / 11 * 3600 as INT64) SECOND)) as dropoff_time_est
 from
 (
   SELECT 
@@ -44,9 +45,11 @@ from
         when 1 then 'TEST'
         ELSE 'NA'
       end as class,
+      CONCAT( CAST(pickup_datetime AS STRING), CAST(pickup_longitude  AS STRING) ) as trip_key,
       *,
       EXTRACT(DAYOFWEEK FROM pickup_datetime) AS trip_dayofweek,
       EXTRACT(HOUR FROM pickup_datetime) AS trip_hourofday,
+      EXTRACT(TIME FROM pickup_datetime) AS pickup_time,
       ST_GeogPoint(pickup_longitude, pickup_latitude) as pickup_geo,
       ST_GeogPoint(dropoff_longitude, dropoff_latitude) as dropoff_geo,
       DATETIME_DIFF(dropoff_datetime, pickup_datetime, SECOND) as trip_duration

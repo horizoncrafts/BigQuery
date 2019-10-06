@@ -21,3 +21,10 @@ bqml.data_stream
    group by extra, mta_tax, imp_surcharge
   LIMIT 1000
    ;
+
+
+-- key
+select count(DISTINCT CONCAT( CAST(pickup_datetime AS STRING), CAST(pickup_longitude  AS STRING) ) ), count(*)
+from `bqml.data_stream` 
+where class = 'TEST'
+;
