@@ -47,51 +47,36 @@ AS
   where class = 'TRAIN'
 ;
   
+
+-- Create the model evaluation view
+create or replace view bqml.evaluation_extra as
 select
   *
 from
-  ML.EVALUATE(
-    MODEL bqml.extra_logst_model,
+  ML.EVALUATE(MODEL mybqml.bqml.extra_logst_model,
     (
       select 
         * EXCEPT(class)
-      from `bqml.extra_logst_stream` 
-      where class = 'TEST'
-           #  limit 1000
+      from 
+        `mybqml.bqml.extra_logst_stream` 
+      where 
+        class = 'TEST'
     )
   )
 ;
 
-
-
-
-0.6791009947123133
-0.5352165014882779
-0.6988901869158879
-0.5264765611547124
-1.065267771121166
-0.7036906666666667
-
-	
-0.925260730999823
-0.8764757692137326
-0.9023072429906541
-0.8965247058521791
-0.7475836276517964
-0.9501716666666666
-
- ;
+-- Create the extra prediction view
+create or replace view bqml.predicted_extra as
 select 
-  * EXCEPT( predicted_extra_str_probs, predicted_extra_str),
-  CAST( predicted_extra_str as FLOAT64 ) as predicted_extra
+  * EXCEPT( predicted_extra_probs, predicted_extra),
+  null as predicted_fare_amount,
+  null as predicted_tolls_amount,
+  predicted_extra
 from
-  ML.PREDICT( 
-    MODEL bqml.extra_logst_model,
+  ML.PREDICT( MODEL mybqml.bqml.extra_logst_model,
     (
       select *
-      ,EXTRACT(TIME FROM pickup_datetime) AS trip_time
-      ,EXTRACT(TIME FROM DATETIME_ADD(pickup_datetime, INTERVAL CAST(geo_distance_miles / 12 * 3600 as INT64) SECOND)) as dropoff_ext
-      from `bqml.data_stream` 
+      from `mybqml.bqml.data_staging`  
       where class = 'TEST'
     )
  )

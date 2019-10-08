@@ -5,7 +5,7 @@ select
   count( DISTINCT ST_ASTEXT(pickup_geo_snap) ) pickup_snap,
   count( DISTINCT ST_ASTEXT(dropoff_geo_snap) ) dropoff_snap,
   count( DISTINCT geo_distance_miles ) distance_miles,
-  count( DISTINCT geo_distance_snap_miles ) distance_snap_miles,
+--  count( DISTINCT geo_distance_snap_miles ) distance_snap_miles,
   count( DISTINCT trip_distance ) trip_distance
 from
 bqml.data_stream
