@@ -1,2 +1,2 @@
-# BigQuery
-BigQuery and GCP excercises
+# BigQuery ML
+BigQuery ML and GCP excercises
